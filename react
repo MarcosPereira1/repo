@@ -2,41 +2,73 @@ import React, { useState } from 'react';
 
 function App() {
     const [categories, setCategories] = useState([]);
-    const [newCategory, setNewCategory] = useState('');
-    const [selectedParent, setSelectedParent] = useState(null);
+    const [creating, setCreating] = useState(false);
+    const [newCategoryName, setNewCategoryName] = useState('');
+    const [subcategories, setSubcategories] = useState([]);
 
-    const addCategory = () => {
-        const newId = categories.length ? Math.max(...categories.map(c => c.id)) + 1 : 1;
-        const newCat = { id: newId, name: newCategory, parentId: selectedParent };
-        setCategories([...categories, newCat]);
-        setNewCategory('');
+    const addSubcategory = () => {
+        setSubcategories([...subcategories, '']);
     };
 
-    const renderCategories = (parentId) => {
-        return categories
-            .filter(cat => cat.parentId === parentId)
-            .map(cat => (
-                <li key={cat.id}>
-                    {cat.name}
-                    <button onClick={() => setSelectedParent(cat.id)}>Criar Subcategoria</button>
-                    <ul>{renderCategories(cat.id)}</ul>
-                </li>
-            ));
+    const updateSubcategoryName = (index, name) => {
+        const newSubcategories = [...subcategories];
+        newSubcategories[index] = name;
+        setSubcategories(newSubcategories);
+    };
+
+    const saveCategory = () => {
+        const newId = categories.length ? Math.max(...categories.map(c => c.id)) + 1 : 1;
+        const newCategory = { id: newId, name: newCategoryName, subcategories };
+        setCategories([...categories, newCategory]);
+        resetForm();
+    };
+
+    const resetForm = () => {
+        setNewCategoryName('');
+        setSubcategories([]);
+        setCreating(false);
     };
 
     return (
         <div>
-            <div>
-                <input
-                    value={newCategory}
-                    onChange={(e) => setNewCategory(e.target.value)}
-                />
-                <button onClick={addCategory}>Adicionar</button>
-                {selectedParent !== null && (
-                    <button onClick={() => setSelectedParent(null)}>Cancelar Seleção</button>
-                )}
-            </div>
-            <ul>{renderCategories(selectedParent)}</ul>
+            {creating ? (
+                <div>
+                    <label>
+                        Nome da categoria:
+                        <input
+                            value={newCategoryName}
+                            onChange={(e) => setNewCategoryName(e.target.value)}
+                        />
+                    </label>
+                    <div>
+                        Subcategorias:
+                        {subcategories.map((name, index) => (
+                            <input
+                                key={index}
+                                value={name}
+                                onChange={(e) => updateSubcategoryName(index, e.target.value)}
+                            />
+                        ))}
+                    </div>
+                    <button onClick={addSubcategory}>+</button>
+                    <button onClick={saveCategory}>Salvar</button>
+                    <button onClick={resetForm}>Cancelar</button>
+                </div>
+            ) : (
+                <button onClick={() => setCreating(true)}>Criar categoria</button>
+            )}
+            <ul>
+                {categories.map(cat => (
+                    <li key={cat.id}>
+                        {cat.name}
+                        <ul>
+                            {cat.subcategories.map((sub, index) => (
+                                <li key={index}>{sub}</li>
+                            ))}
+                        </ul>
+                    </li>
+                ))}
+            </ul>
         </div>
     );
 }
