@@ -1,55 +1,44 @@
 import React, { useState } from 'react';
 
 function App() {
-  const [categories, setCategories] = useState([]);
-  const [newCategory, setNewCategory] = useState('');
-  const [selectedParent, setSelectedParent] = useState(null);
-  const [trail, setTrail] = useState([]);
+    const [categories, setCategories] = useState([]);
+    const [newCategory, setNewCategory] = useState('');
+    const [selectedParent, setSelectedParent] = useState(null);
 
-  const addCategory = () => {
-    const newId = categories.length ? Math.max(...categories.map(c => c.id)) + 1 : 1;
-    const newCat = { id: newId, name: newCategory, parentId: selectedParent };
-    setCategories([...categories, newCat]);
-    setNewCategory('');
-  };
+    const addCategory = () => {
+        const newId = categories.length ? Math.max(...categories.map(c => c.id)) + 1 : 1;
+        const newCat = { id: newId, name: newCategory, parentId: selectedParent };
+        setCategories([...categories, newCat]);
+        setNewCategory('');
+    };
 
-  const selectCategory = (categoryId, categoryName) => {
-    setSelectedParent(categoryId);
-    setTrail([...trail, { id: categoryId, name: categoryName }]);
-  };
+    const renderCategories = (parentId) => {
+        return categories
+            .filter(cat => cat.parentId === parentId)
+            .map(cat => (
+                <li key={cat.id}>
+                    {cat.name}
+                    <button onClick={() => setSelectedParent(cat.id)}>Criar Subcategoria</button>
+                    <ul>{renderCategories(cat.id)}</ul>
+                </li>
+            ));
+    };
 
-  const resetSelection = () => {
-    setSelectedParent(null);
-    setTrail([]);
-  };
-
-  const currentCategory = trail[trail.length - 1]?.id || null;
-
-  return (
-    <div>
-      <div>
-        <input 
-          value={newCategory} 
-          onChange={(e) => setNewCategory(e.target.value)} 
-        />
-        <button onClick={addCategory}>Adicionar</button>
-        <button onClick={resetSelection}>Reiniciar seleção</button>
-      </div>
-      <div>
-        <p>Trilha:</p>
-        {trail.map((t, index) => (
-          <span key={t.id} onClick={() => setTrail(trail.slice(0, index + 1))}>{t.name} > </span>
-        ))}
-      </div>
-      <ul>
-        {categories.filter(cat => cat.parentId === currentCategory).map(cat => (
-          <li key={cat.id} onClick={() => selectCategory(cat.id, cat.name)}>
-            {cat.name}
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
+    return (
+        <div>
+            <div>
+                <input
+                    value={newCategory}
+                    onChange={(e) => setNewCategory(e.target.value)}
+                />
+                <button onClick={addCategory}>Adicionar</button>
+                {selectedParent !== null && (
+                    <button onClick={() => setSelectedParent(null)}>Cancelar Seleção</button>
+                )}
+            </div>
+            <ul>{renderCategories(selectedParent)}</ul>
+        </div>
+    );
 }
 
-export default App;
+export  {App};
