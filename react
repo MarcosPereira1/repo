@@ -1,0 +1,62 @@
+import React, { useState } from 'react';
+
+function App() {
+  const [categorias, setCategorias] = useState([]);
+  const [nomeCategoria, setNomeCategoria] = useState("");
+  const [categoriaPaiId, setCategoriaPaiId] = useState(null);
+  const [ultimoId, setUltimoId] = useState(0);
+
+  const adicionarCategoria = () => {
+    if (categoriaPaiId && !categorias.some(cat => cat.id === categoriaPaiId)) {
+      alert('Categoria mãe não encontrada!');
+      return;
+    }
+    
+    const novaCategoria = {
+      id: ultimoId + 1,
+      nome: nomeCategoria,
+      categoria_pai_id: categoriaPaiId || null
+    };
+    
+    setCategorias(prevCategorias => [...prevCategorias, novaCategoria]);
+    setNomeCategoria("");
+    setCategoriaPaiId(null);
+    setUltimoId(ultimoId + 1);
+  };
+
+  return (
+    <div className="App">
+      <h1>Gerenciador de Categorias</h1>
+      
+      <div>
+        <input 
+          placeholder="Nome da categoria" 
+          value={nomeCategoria}
+          onChange={e => setNomeCategoria(e.target.value)} 
+        />
+        
+        <select value={categoriaPaiId || ""} onChange={e => setCategoriaPaiId(Number(e.target.value) || null)}>
+          <option value="">-- Selecione a categoria mãe --</option>
+          {categorias.map(cat => (
+            <option key={cat.id} value={cat.id}>{cat.nome}</option>
+          ))}
+        </select>
+        
+        <button onClick={adicionarCategoria}>Adicionar Categoria</button>
+      </div>
+      
+      <div>
+        <h2>Categorias</h2>
+        <ul>
+          {categorias.map(cat => (
+            <li key={cat.id}>
+              {cat.nome} {cat.categoria_pai_id ? `(Subcategoria de ${categorias.find(c => c.id === cat.categoria_pai_id).nome})` : ""}
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  );
+}
+
+export default App;
