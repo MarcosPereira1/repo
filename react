@@ -16,7 +16,12 @@ function App() {
   const selectCategory = (categoryId, categoryName) => {
     setSelectedParent(categoryId);
     setTrail([...trail, { id: categoryId, name: categoryName }]);
-  }
+  };
+
+  const resetSelection = () => {
+    setSelectedParent(null);
+    setTrail([]);
+  };
 
   const currentCategory = trail[trail.length - 1]?.id || null;
 
@@ -28,6 +33,7 @@ function App() {
           onChange={(e) => setNewCategory(e.target.value)} 
         />
         <button onClick={addCategory}>Adicionar</button>
+        <button onClick={resetSelection}>Reiniciar seleção</button>
       </div>
       <div>
         <p>Trilha:</p>
