@@ -4,7 +4,7 @@ function App() {
   const [categories, setCategories] = useState([]);
   const [newCategory, setNewCategory] = useState('');
   const [selectedParent, setSelectedParent] = useState(null);
-  const [selectedCategoryId, setSelectedCategoryId] = useState(null);
+  const [trail, setTrail] = useState([]);
 
   const addCategory = () => {
     const newId = categories.length ? Math.max(...categories.map(c => c.id)) + 1 : 1;
@@ -13,10 +13,12 @@ function App() {
     setNewCategory('');
   };
 
-  const selectCategory = (categoryId) => {
-    setSelectedCategoryId(categoryId);
+  const selectCategory = (categoryId, categoryName) => {
     setSelectedParent(categoryId);
+    setTrail([...trail, { id: categoryId, name: categoryName }]);
   }
+
+  const currentCategory = trail[trail.length - 1]?.id || null;
 
   return (
     <div>
@@ -27,9 +29,15 @@ function App() {
         />
         <button onClick={addCategory}>Adicionar</button>
       </div>
+      <div>
+        <p>Trilha:</p>
+        {trail.map((t, index) => (
+          <span key={t.id} onClick={() => setTrail(trail.slice(0, index + 1))}>{t.name} > </span>
+        ))}
+      </div>
       <ul>
-        {categories.filter(cat => cat.parentId === selectedCategoryId).map(cat => (
-          <li key={cat.id} onClick={() => selectCategory(cat.id)}>
+        {categories.filter(cat => cat.parentId === currentCategory).map(cat => (
+          <li key={cat.id} onClick={() => selectCategory(cat.id, cat.name)}>
             {cat.name}
           </li>
         ))}
